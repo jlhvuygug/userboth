@@ -1,7 +1,8 @@
 import os
-from dotenv import load_dotenv  # .env fayldan ma'lumot yuklash uchun
+from dotenv import load_dotenv
 
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 import openai
 import asyncio
 
@@ -11,18 +12,19 @@ load_dotenv()
 # 2. OpenAI kalitini .env fayldan olamiz
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# 3. Telegram uchun API ID va HASH to'g'ridan-to'g'ri yozilgan (xavfsiz bo'lishi uchun aslida .env faylga o‘tkazish kerak)
-api_id = 26968121
-api_hash = "bee8f7a35a42028df27198097365364c"
+# 3. Telegram uchun API ID, HASH va StringSession .env dan olinadi
+api_id = int(os.getenv("API_ID"))
+api_hash = os.getenv("API_HASH")
 
-# 4. Telegram sessiya fayl nomi
-client = TelegramClient('husanjon_session', api_id, api_hash)
+
+# 4. Telegram klientini yaratamiz
+client = TelegramClient(StringSession(string), api_id, api_hash)
 
 # 5. ChatGPT'dan javob olish funksiyasi
 async def get_gpt_response(message):
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # yoki 'gpt-4' mavjud bo‘lsa
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Sen Husanjon Musayevsan. Oddiy, samimiy, hazilkash ohangda gapirasan."},
                 {"role": "user", "content": message}
@@ -36,12 +38,15 @@ async def get_gpt_response(message):
 # 6. Telegramda yangi xabar kelganda javob beruvchi funksiyani yozamiz
 @client.on(events.NewMessage(incoming=True))
 async def handler(event):
-    if event.is_private:  # Faqat shaxsiy chatlarga javob beradi
+    if event.is_private:
         user_message = event.raw_text
-        await asyncio.sleep(2)  # Javob tabii ko‘rinsin deb 2 soniya kutish
+        await asyncio.sleep(2)
         reply = await get_gpt_response(user_message)
         await event.reply(reply)
 
 # 7. Botni ishga tushiramiz
-client.start()
-client.run_until_disconnected()
+async def main():
+    await client.start()
+    await client.run_until_disconnected()
+
+asyncio.run(main())
