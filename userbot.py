@@ -13,8 +13,8 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # 3. Telegram uchun API ID, HASH va StringSession .env dan olinadi
-api_id = int(os.getenv("API_ID"))
-api_hash = os.getenv("API_HASH")
+api_id = 26968121 
+api_hash = "bee8f7a35a42028df27198097365364c" 
 
 
 # 4. Telegram klientini yaratamiz
