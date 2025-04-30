@@ -25,8 +25,9 @@ client = TelegramClient(StringSession(session_string), api_id, api_hash)
 # 5. ChatGPT'dan javob olish funksiyasi
 async def get_gpt_response(message):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+        # Yangi OpenAI API formatiga moslashtirilgan kod
+        response = openai.completions.create(
+            model="gpt-3.5-turbo",  # Yoki yangi modelni ishlatishingiz mumkin
             messages=[{
                 "role": "system", 
                 "content": "Sen Husanjon Musayevsan. Oddiy, samimiy, hazilkash ohangda gapirasan."
@@ -37,7 +38,7 @@ async def get_gpt_response(message):
             }],
             temperature=0.7
         )
-        return response.choices[0].message.content.strip()
+        return response['choices'][0]['message']['content'].strip()
     except Exception as e:
         return f"Xatolik: {e}"
 
